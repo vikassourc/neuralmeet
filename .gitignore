@@ -1,0 +1,46 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual envs ──────────────────────────────────────────────────────────────
+.venv/
+.venv-1/
+venv/
+env/
+ENV/
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+.streamlit/secrets.toml
+
+# ── Downloaded / temp files ───────────────────────────────────────────────────
+downloades/
+downloads/
+*.wav
+*.mp3
+*.mp4
+*.m4a
+*.webm
+*.mkv
+*_chunk_*.wav
+
+# ── ChromaDB / vector store ───────────────────────────────────────────────────
+chroma_db/
+*.sqlite3
+
+# ── Meeting history data ──────────────────────────────────────────────────────
+data/transcripts/
+data/history.json
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
