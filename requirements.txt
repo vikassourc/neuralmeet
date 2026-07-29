@@ -3,7 +3,7 @@
 streamlit>=1.35.0
 
 # --- Audio acquisition ---
-yt-dlp>=2024.7.1
+git+https://github.com/yt-dlp/yt-dlp.git@master
 pytube>=15.0.0
 
 # --- Transcription (local Whisper) ---
