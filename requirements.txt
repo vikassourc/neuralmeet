@@ -9,6 +9,8 @@ pytube>=15.0.0
 # --- Transcription (local Whisper) ---
 openai-whisper>=20231117
 ffmpeg-python>=0.2.0
+pydub>=0.25.1
+numba>=0.58.1
 torch>=2.2.0
 torchaudio>=2.2.0
 
