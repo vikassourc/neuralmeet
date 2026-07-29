@@ -63,6 +63,8 @@ def download_youtube_audio(url: str) -> str:
         "retries": 5,             # retry on network errors
         "quiet": True,
         "no_warnings": True,      # suppress JS runtime warnings
+        # Bypass 403 Forbidden errors on cloud servers by impersonating mobile clients
+        "extractor_args": {"youtube": {"client": ["android", "ios", "web"]}}
     }
     if FFMPEG_BIN:
         ydl_opts["ffmpeg_location"] = os.path.dirname(FFMPEG_BIN)
