@@ -2,7 +2,8 @@ import os
 import shutil
 
 import yt_dlp
-from pydub import AudioSegment
+import subprocess
+import math
 
 DOWNLOAD_DIR = 'downloades'
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -34,11 +35,7 @@ def find_ffmpeg():
 
 
 FFMPEG_BIN, FFPROBE_BIN = find_ffmpeg()
-if FFMPEG_BIN and FFPROBE_BIN:
-    AudioSegment.converter = FFMPEG_BIN
-    AudioSegment.ffprobe = FFPROBE_BIN
-    os.environ["PATH"] = os.path.dirname(FFMPEG_BIN) + os.pathsep + os.environ.get("PATH", "")
-else:
+if not FFMPEG_BIN or not FFPROBE_BIN:
     print("Warning: FFmpeg is not installed or not found in PATH. Audio conversion may fail.")
 
 def download_youtube_audio(url: str) -> str:
@@ -80,25 +77,23 @@ def download_youtube_audio(url: str) -> str:
 
 
 def convert_to_wav(input_path: str) -> str:
-    """Convert any audio/video file to WAV format using pydub."""
+    """Convert any audio/video file to WAV format using ffmpeg."""
     output_path = os.path.splitext(input_path)[0] + "_converted.wav"
-    audio = AudioSegment.from_file(input_path)
-    audio = audio.set_channels(1).set_frame_rate(16000) #16khz
-    audio.export(output_path, format="wav")
+    subprocess.run(["ffmpeg", "-y", "-i", input_path, "-ac", "1", "-ar", "16000", output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return output_path
 
 
 
 def chunk_audio(wav_path : str , chunk_minutes : int = 10) -> list:
-    audio = AudioSegment.from_wav(wav_path)
-    chunk_ms = chunk_minutes * 60 * 1000 
+    result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", wav_path], stdout=subprocess.PIPE, text=True)
+    duration = float(result.stdout.strip())
+    chunk_secs = chunk_minutes * 60 
 
     chunks = []
 
-    for i, start in enumerate(range(0,len(audio),chunk_ms)):
-        chunk = audio[start : start + chunk_ms]
+    for i, start in enumerate(range(0, int(math.ceil(duration)), chunk_secs)):
         chunk_path = f"{wav_path}_chunk_{i}.wav"
-        chunk.export(chunk_path , format = "wav")
+        subprocess.run(["ffmpeg", "-y", "-i", wav_path, "-ss", str(start), "-t", str(chunk_secs), "-c", "copy", chunk_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         chunks.append(chunk_path)
     

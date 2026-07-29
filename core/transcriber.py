@@ -1,7 +1,6 @@
 import whisper
 import os
 import requests
-from pydub import AudioSegment
 
 # Sarvam's sync STT-translate API rejects audio longer than 30s.
 # We slice each chunk into 25s pieces (with a 5s safety margin) before sending.
@@ -72,16 +71,20 @@ def transcribe_chunk_sarvam(chunk_path: str) -> str:
     if not SARVAM_API_KEY:
         raise RuntimeError("SARVAM_API_KEY is not set in environment / .env")
 
-    audio = AudioSegment.from_wav(chunk_path)
-    piece_ms = SARVAM_PIECE_SECONDS * 1000
+    import subprocess
+    import math
+
+    result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", chunk_path], stdout=subprocess.PIPE, text=True)
+    duration_secs = float(result.stdout.strip())
 
     full_text = ""
-    total_pieces = (len(audio) + piece_ms - 1) // piece_ms
+    total_pieces = int(math.ceil(duration_secs / SARVAM_PIECE_SECONDS))
 
-    for i, start in enumerate(range(0, len(audio), piece_ms)):
-        piece = audio[start: start + piece_ms]
+    for i in range(total_pieces):
+        start = i * SARVAM_PIECE_SECONDS
         piece_path = f"{chunk_path}_sv_{i}.wav"
-        piece.export(piece_path, format="wav")
+        
+        subprocess.run(["ffmpeg", "-y", "-i", chunk_path, "-ss", str(start), "-t", str(SARVAM_PIECE_SECONDS), "-c", "copy", piece_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         try:
             print(f"  → Sarvam piece {i + 1}/{total_pieces} ...")
