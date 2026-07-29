@@ -7,11 +7,13 @@ yt-dlp>=2024.7.1
 pytube>=15.0.0
 
 # --- Transcription (local Whisper) ---
+--extra-index-url https://download.pytorch.org/whl/cpu
 openai-whisper>=20231117
 ffmpeg-python>=0.2.0
 numba>=0.58.1
 torch>=2.2.0
 torchaudio>=2.2.0
+torchvision>=0.17.0
 
 # --- Translation (Hindi -> English, if not handled directly by Whisper) ---
 deep-translator>=1.11.4
