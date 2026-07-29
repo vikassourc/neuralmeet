@@ -667,7 +667,7 @@ with st.sidebar:
     source = None
     st.session_state.audio_bytes = None
     if input_mode == "🔗 URL / Path":
-        source = st.text_input("", placeholder="https://youtube.com/watch?v=... or /path/to/file.mp4")
+        source = st.text_input("URL or Path", placeholder="https://youtube.com/watch?v=... or /path/to/file.mp4", label_visibility="collapsed")
     else:
         uploaded = st.file_uploader("", type=["mp3","wav","m4a","mp4","mov","mkv"], label_visibility="collapsed")
         if uploaded:
